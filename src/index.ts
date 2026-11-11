@@ -6,8 +6,8 @@ import prisma from './config/prisma'
 
 import dotenv from 'dotenv'
 import cors from 'cors'
-//import userRouter from "./routes/userRoute";
-//import postRouter from "./routes/postRoute";
+
+import { runSeed } from './config/seed';
 
 import specialtyRoutes from './routes/specialty.routes';
 import doctorRoutes from './routes/doctor.routes';
@@ -15,9 +15,9 @@ import patientRoutes from './routes/patient.routes';
 import appointmentRoutes from './routes/appointment.routes';
 import userRoutes from './routes/user.routes';
 
-async function runSeed(): Promise<void> {
-  console.log('error relacionado con la configuración de la Seed.');
-}
+// async function runSeed(): Promise<void> {
+//  console.log('error relacionado con la configuración de la Seed.');
+// }
 
 dotenv.config();
 
