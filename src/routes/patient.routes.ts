@@ -1,11 +1,13 @@
 // src/routes/patient.routes.ts
 import { Router } from 'express';
-
-import { getPatients, createPatient } from '../controllers/patient.controller';
+import { createPatient, getPatients, getPatientById } from '../controllers/patient.controller.js';
+import { validatePatient } from '../middlewares/validate-patient.js';
 
 const router: Router = Router();
+
+router.post('/', validatePatient, createPatient);
 router.get('/', getPatients);
-router.post('/', createPatient);  // Nuevo método POST
+router.get('/:id', getPatientById);
 
 export default router;
 // fin - src/routes/patient.routes.ts
