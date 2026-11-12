@@ -1,5 +1,6 @@
 // src/config/seed.ts
 import bcrypt from 'bcrypt';
+// import { runSeed }
 import prisma from './prisma.js';
 
 // deleteMany() no reinicia los contadores autoincrementales de PostgreSQL
@@ -79,17 +80,45 @@ export async function runSeed() {
     ]
   });
 
-  console.log(" Insertando Usuarios del Sistema...");
-  await prisma.user.createMany({
-    data: [
-      { name: "jesus", email: "jcerdan@gmail.com", password: "funval", role_id: 4, role: "GERENCIA" },
-      { name: "manager", email: "gerencia@clinica.pe", password: "manager", role_id: 3, role: "GERENCIA" },
-      { name: "doctor", email: "doc@clinica.pe", password: "doc123", role_id: 2, role: "MEDICO" },
-      { name: "nena", email: "recept@clinica.pe", password: "ingresos", role_id: 1, role: "RECEPCIONISTA" },
-    ]
-  });
+//   console.log("Insertando Usuarios encriptados del Sistema...");
+//     const [passJesus, passManager, passDoctor, passNena] = await Promise.all([
+//     bcrypt.hash("funval", 10),
+//     bcrypt.hash("manager", 10),
+//     bcrypt.hash("doc123", 10),
+//     bcrypt.hash("ingresos", 10),
+//    ]);
 
-  console.log(" Nueva! ...Base de datos sembrada con éxito con el nuevo esquema!");
+//    await prisma.user.createMany({
+//      data: [
+//        { name: "jesus", email: "jcerdan@gmail.com", password: passJesus, role_id: 4, role: "GERENCIA" },
+//        { name: "manager", email: "gerencia@clinica.pe", password: passManager, role_id: 3, role: "GERENCIA" },
+//        { name: "doctor", email: "doc@clinica.pe", password: passDoctor, role_id: 2, role: "MEDICO" },
+//        { name: "nena", email: "recept@clinica.pe", password: passNena, role_id: 1, role: "RECEPCIONISTA" },
+//      ],
+//    });
+
+  console.log(" Insertando Usuarios encriptado del Sistema...");
+  await prisma.user.createMany({
+     data: [
+     { name: "jesus", email: "jcerdan@gmail.com", password: await bcrypt.hash("funval", 10), role_id: 4, role: "GERENCIA" },
+     { name: "manager", email: "gerencia@clinica.pe", password: await bcrypt.hash("manager", 10), role_id: 3, role: "GERENCIA" },
+     { name: "doctor", email: "doc@clinica.pe", password: await bcrypt.hash("doc123", 10), role_id: 2, role: "MEDICO" },
+     { name: "nena", email: "recept@clinica.pe", password: await bcrypt.hash("ingresos", 10), role_id: 1, role: "RECEPCIONISTA" },
+  ]
+});
+  console.log(" ¡Base de datos sembrada con éxito con el nuevo esquema!");
+}
+
+// Ejecución automática al llamar el script
+if (process.argv[1]?.includes('seed')) {
+  runSeed()
+    .catch((e) => {
+      console.error("> Error ejecutando el seed:", e);
+      process.exit(1);
+    })
+    .finally(async () => {
+      await prisma.$disconnect();
+    });
 }
 
 // Ejecución automática al llamar el script

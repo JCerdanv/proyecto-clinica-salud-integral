@@ -59,21 +59,17 @@ export const getDoctorById = async (req: Request, res: Response) => {
       return res.status(400).json({ error: '> El ID debe ser un numero válido' });
     }
 
-    const doctor = await prisma.medico.findUnique({
-      where: { id },
-      include: { especialidad: true }
-    });
+    const doctor = await DoctorModel.getDoctorById(id);
 
     if (!doctor) {
       return res.status(404).json({ error: '> Doctor no encontrado' });
     }
 
-    res.json(doctor);
+    return res.json(doctor);
   } catch (error) {
-    res.status(500).json({ error: '> Error al buscar el Doctor' });
+    return res.status(500).json({ error: '> Error al buscar el Doctor' });
   }
 };
-
 
 
 // fin - src/controllers/doctor.controller.ts
