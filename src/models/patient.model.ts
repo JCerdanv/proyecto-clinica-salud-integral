@@ -15,7 +15,28 @@ export const getAllPatients = () => {
 
 export const getPatientById = (id: number) => {
   return prisma.paciente.findUnique({
-    where: { id }
+    where: { id },
+    include: {
+      citas: {
+        include: {
+          medico: {
+            include: {
+              especialidad: true
+            }
+          }
+        },
+        orderBy: { dateTime: 'desc' }
+      }
+    }
   });
 };
+
+// antes
+//export const getPatientById = (id: number) => {
+//  return prisma.paciente.findUnique({
+//    where: { id }
+//  });
+//};
+
+
 // fin - src/models/patient.model.ts

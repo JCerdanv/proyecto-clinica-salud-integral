@@ -21,9 +21,8 @@ export const getDoctors = async (req: Request, res: Response) => {
 export const createDoctor = async (req: Request, res: Response) => {
   try {
     const { nombre, apellido, cmp, phone_number, ecorreo, specialtyId } = req.body;
-
-    if (!nombre || !apellido || !cmp || !phone_number || !ecorreo || !specialtyId) {
-      return res.status(400).json({ error: 'Todos los campos del médico son obligatorios' });
+    if (!nombre || !apellido || !cmp  || !phone_number || !ecorreo || !specialtyId) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
     const data = await DoctorModel.createDoctor({
@@ -60,15 +59,15 @@ export const getDoctorById = async (req: Request, res: Response) => {
       return res.status(400).json({ error: '> El ID debe ser un numero válido' });
     }
 
-    const patient = await DoctorModel.getDoctorById(id);
+    const doctor = await DoctorModel.getDoctorById(id);
 
-    if (!patient) {
+    if (!doctor) {
       return res.status(404).json({ error: '> Doctor no encontrado' });
     }
 
-    res.json(patient);
+    return res.json(doctor);
   } catch (error) {
-    res.status(500).json({ error: '> Error al buscar el Doctor' });
+    return res.status(500).json({ error: '> Error al buscar el Doctor' });
   }
 };
 

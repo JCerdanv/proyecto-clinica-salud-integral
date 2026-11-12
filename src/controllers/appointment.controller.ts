@@ -37,4 +37,27 @@ export const createAppointment = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al agendar la cita' });
   }
 };
+
+
+
+export const getAppointmentById = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: '> El ID debe ser un número válido' });
+    }
+
+    const appointment = await prisma.cita.findUnique({ where: { id } });
+
+    if (!appointment) {
+      return res.status(404).json({ error: '> Cita no encontrada' });
+    }
+
+    res.json(appointment);
+  } catch (error) {
+    res.status(500).json({ error: '> Error al buscar el Cita' });
+  }
+};
+
+
 // fin - src/controllers/appointment.controller.ts
