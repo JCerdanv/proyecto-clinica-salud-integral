@@ -11,6 +11,26 @@ export const getPatients = async (req: Request, res: Response) => {
   }
 };
 
+export const getPatientById = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: 'El ID debe ser un número válido' });
+    }
+
+    const patient = await prisma.paciente.findUnique({ where: { id } });
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Paciente no encontrado' });
+    }
+
+    res.json(patient);
+  } catch (error) {
+    res.status(500).json({ error: 'Error al buscar el paciente' });
+  }
+};
+
+
 export const createPatient = async (req: Request, res: Response) => {
   try {
     const { nombre, apellido, dni, phone_number, ecorreo, comentario } = req.body;

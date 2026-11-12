@@ -1,4 +1,8 @@
 allowBuilds:
   '@prisma/engines': true
+  '@scarf/scarf': true
+  bcrypt: set this to true or false
+  core-js: true
   esbuild: true
+  nodemon: true
   prisma: true

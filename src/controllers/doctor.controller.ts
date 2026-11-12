@@ -15,8 +15,8 @@ export const getDoctors = async (req: Request, res: Response) => {
 
 export const createDoctor = async (req: Request, res: Response) => {
   try {
-    const { nombre, apellido, cmp, specialtyId } = req.body;
-    if (!nombre || !apellido || !cmp || !specialtyId) {
+    const { nombre, apellido, cmp, phone_number, ecorreo, specialtyId } = req.body;
+    if (!nombre || !apellido || !cmp  || !phone_number || !ecorreo || !specialtyId) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -28,4 +28,30 @@ export const createDoctor = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Error al registrar el médico' });
   }
 };
+
+
+export const getDoctorById = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: '> El ID debe ser un numero válido' });
+    }
+
+    const doctor = await prisma.medico.findUnique({
+      where: { id },
+      include: { especialidad: true }
+    });
+
+    if (!doctor) {
+      return res.status(404).json({ error: '> Doctor no encontrado' });
+    }
+
+    res.json(doctor);
+  } catch (error) {
+    res.status(500).json({ error: '> Error al buscar el Doctor' });
+  }
+};
+
+
+
 // fin - src/controllers/doctor.controller.ts

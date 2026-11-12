@@ -6,8 +6,26 @@ import prisma from './config/prisma'
 
 import dotenv from 'dotenv'
 import cors from 'cors'
-//import userRouter from "./routes/userRoute";
-//import postRouter from "./routes/postRoute";
+// import { output, z } from "zod";
+//import swaggerUi from "swagger-ui-express"; // Importar Swagger UI
+import swaggerUi from "swagger-ui-express";
+import { readFileSync } from "node:fs";
+const swaggerFile = JSON.parse(readFileSync(new URL("./swagger/swagger_output.json", import.meta.url), "utf-8"));
+
+dotenv.config();
+
+// import { swaggerSpec } from "./config/swagger.js"; // Importar configuración
+
+
+// 1. Define un esquema
+//const UserSchema = z.object({
+//  name: z.string(),
+//  edad: z.number().positive(),
+//});
+
+// 2. Valida datos
+// const resultado = UserSchema.parse({ name: "Ana", edad: 25 });
+
 
 import specialtyRoutes from './routes/specialty.routes';
 import doctorRoutes from './routes/doctor.routes';
@@ -22,15 +40,8 @@ async function runSeed(): Promise<void> {
 dotenv.config();
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
-
-// Habilitar CORS para todas las rutas
-//const corsOptions = {
-//  origin: "http://localhost:3000", // Permitir solo este origen
-//  methods: ["GET", "POST"],        // Métodos permitidos
-//  credentials: true                // Permitir envío de cookies o cabeceras de autenticación
-//};
-// app.use(cors(corsOptions));
+const PORT = process.env.PORT || 3000
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 app.use(cors());
 
@@ -52,21 +63,21 @@ app.get('/data', async (req: Request, res: Response) => {
 // Endpoint para iniciar o reiniciar los datos de la clínica
 // app.get('/data', async (req, res) => {
   try {
-    console.log(" Solicitud recibida: Reiniciando base de datos...")
+    console.log("... Solicitud recibida: Reiniciando base de datos...")
     
     // Invocamos la función modularizada
     await runSeed()
 
     res.status(200).json({
       success: true,
-      message: "Base de datos restablecida e inicializada con los datos de prueba exitosamente."
+      message: "... Base de datos restablecida e inicializada con los datos de prueba exitosamente."
     })
   } catch (error) {
-    console.error("> Error ejecutando el seed desde HTTP:", error)
+    console.error(">> Error ejecutando el seed desde HTTP:", error)
     
     res.status(500).json({
       success: false,
-      error: "> Error interno al intentar reiniciar los datos del servidor.",
+      error: ">> Error interno al intentar reiniciar los datos del servidor.",
       details: error instanceof Error ? error.message : String(error)
     })
   }
@@ -88,6 +99,7 @@ app.listen(PORT, () => {
   console.log(`   - Pacientes:      http://localhost:${PORT}/api/patients`);
   console.log(`   - Citas:          http://localhost:${PORT}/api/appointments`);
   console.log(`   - Usuarios:       http://localhost:${PORT}/api/users`);
+  console.log(`  Swagger:           http://localhost:${PORT}/api/docs`)
 });
 
 
