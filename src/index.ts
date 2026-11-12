@@ -33,9 +33,9 @@ import patientRoutes from './routes/patient.routes';
 import appointmentRoutes from './routes/appointment.routes';
 import userRoutes from './routes/user.routes';
 
-async function runSeed(): Promise<void> {
-  console.log('error relacionado con la configuración de la Seed.');
-}
+// async function runSeed(): Promise<void> {
+//  console.log('error relacionado con la configuración de la Seed.');
+// }
 
 dotenv.config();
 
