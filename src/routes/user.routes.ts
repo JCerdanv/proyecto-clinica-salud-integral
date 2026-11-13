@@ -1,88 +1,44 @@
 // src/routes/user.routes.ts
-//import { Router } from 'express';
 
-import { Router, Request, Response } from 'express';
-import { getUsers, getUsersById, createUser, loginUser } from '../controllers/user.controller';
+import { Router } from 'express';
+import { getUsers, getUsersById, createUser, loginUser } from '../controllers/user.controller.js';
+import { verifyToken } from '../middlewares/auth.middleware.js';
+import { authorize } from '../middlewares/authorize.middleware.js';
+import { validateCreateUser, validateLogin } from '../middlewares/validate-user.js';
 
 const router: Router = Router();
-router.get('/', getUsers);
-router.get('/:id', getUsersById);
-router.post('/', createUser); // Nuevo método POST
 
-router.get('/:id', (req, res) => {
-  // #swagger.tags = ['Especialidades']
-  // #swagger.summary = 'Lista una especialidad'
-   return getUsersById(req, res);
+// Única ruta pública del módulo
+//router.post('/login', validateLogin, loginUser);
+router.post('/login', validateLogin, (req, res) => {
+  // #swagger.tags = ['Usuarios']
+  // #swagger.summary = 'Iniciar sesión y obtener token JWT'
+  return loginUser(req, res);
 });
 
 
-// router.post('/login', async (req: Request, res: Response) => {
-router.post('/login', (req, res) => {    
+// Rutas administrativas (Solo GERENCIA)
+//router.get('/', verifyToken, authorize('GERENCIA'), getUsers);
+router.get('/', verifyToken, authorize('GERENCIA'), (req, res) => {
   // #swagger.tags = ['Usuarios']
-  // #swagger.summary = 'Iniciar sesión y obtener token JWT'
-  /* #swagger.requestBody = {
-      required: true,
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            required: ["email", "password"],
-            properties: {
-              email: { type: "string", example: "admin@clinica.com" },
-              password: { type: "string", example: "123456" }
-            }
-          }
-        }
-      }
-    }
-  */
-  /* #swagger.responses[200] = {
-      description: 'Login exitoso',
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              token: { type: "string", example: "eyJhbGciOiJIUzI1NiIs..." }
-            }
-          }
-        }
-      }
-    }
-  */
-  // #swagger.responses[401] = { description: 'Credenciales inválidas' }
-  
-  return loginUser(req, res);
-  /*
-  // ... lógica de tu controlador  
-  try {
-    const { email, password } = req.body;
-    const user = await prisma.user.findUnique({ where: { email } });
+  // #swagger.summary = 'Listar todos los usuarios (Solo GERENCIA)'
+  return getUsers(req, res);
+});  
 
-    if (!user) {
-      res.status(401).json({ message: '> Usuario incorrecto' });
-      return;
-    }
 
-    const isValidPassword = await bcrypt.compare(password, user.password);
+//router.get('/:id', verifyToken, authorize('GERENCIA'), getUsersById);
+router.get('/:id', verifyToken, authorize('GERENCIA'), (req, res) => {
+  // #swagger.tags = ['Usuarios']
+  // #swagger.summary = 'Obtener un usuario por ID (Solo GERENCIA)'
+  return getUsersById(req, res);
+});
 
-    if (!isValidPassword) {
-       res.status(401).json({ message: '> Credenciales inválidas' });
-       return;
-    }
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET as string,
-      { expiresIn: '1h' }
-    );
-
-    res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ message: '> Error al iniciar sesión' });
-  }
-  });
-*/
+//router.post('/', verifyToken, authorize('GERENCIA'), validateCreateUser, createUser);
+router.post('/', verifyToken, authorize('GERENCIA'), validateCreateUser, (req, res) => {
+  // #swagger.tags = ['Usuarios']
+  // #swagger.summary = 'Crear un nuevo usuario (Solo GERENCIA)'
+  return createUser(req, res);
 });
 
 export default router;

@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "version": "1.0.0",
+    "version": "1.2.0",
     "title": "API Clínica Salud Integral",
     "description": "Documentación generada con OpenAPI 3.0"
   },
@@ -14,6 +14,10 @@
   "paths": {
     "/": {
       "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Verificar estado del servidor",
         "description": "",
         "responses": {
           "200": {
@@ -24,6 +28,10 @@
     },
     "/api": {
       "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Endpoint base con CORS habilitado",
         "description": "",
         "responses": {
           "200": {
@@ -33,14 +41,119 @@
       }
     },
     "/data": {
-      "get": {
+      "post": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Reiniciar y sembrar base de datos (Solo GERENCIA)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Registrar un nuevo usuario",
+        "description": "",
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "example": "any"
+                  },
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  },
+                  "role_id": {
+                    "example": "any"
+                  },
+                  "role": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Iniciar sesión y obtener token JWT",
         "description": "",
         "responses": {
           "200": {
             "description": "OK"
           },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -59,16 +172,31 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       },
       "post": {
         "tags": [
@@ -114,14 +242,14 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "name"
+                  "nombre"
                 ],
                 "properties": {
-                  "name": {
+                  "nombre": {
                     "type": "string",
                     "example": "Cardiología"
                   },
-                  "description": {
+                  "descripcion": {
                     "type": "string",
                     "example": "Atención cardiovascular"
                   }
@@ -137,13 +265,20 @@
         "tags": [
           "Especialidades"
         ],
-        "summary": "Lista una especialidad",
+        "summary": "Obtener una especialidad por ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -156,24 +291,85 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     },
     "/api/doctors/": {
-      "post": {
+      "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Listar todos los médicos",
         "description": "",
+        "parameters": [
+          {
+            "name": "specialty",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Registrar un nuevo médico (Solo GERENCIA)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -208,27 +404,27 @@
             }
           }
         }
-      },
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
       }
     },
     "/api/doctors/{id}": {
       "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Obtener un médico por ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -240,6 +436,9 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -251,8 +450,48 @@
       }
     },
     "/api/patients/": {
-      "post": {
+      "get": {
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Listar todos los pacientes",
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Registrar un nuevo paciente (GERENCIA o RECEPCIONISTA)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -260,45 +499,11 @@
           "400": {
             "description": "Bad Request"
           },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nombre": {
-                    "example": "any"
-                  },
-                  "apellido": {
-                    "example": "any"
-                  },
-                  "dni": {
-                    "example": "any"
-                  },
-                  "phone_number": {
-                    "example": "any"
-                  },
-                  "ecorreo": {
-                    "example": "any"
-                  },
-                  "comentario": {
-                    "example": "any"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -308,12 +513,23 @@
     },
     "/api/patients/{id}": {
       "get": {
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Obtener expediente completo de un paciente por ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -325,6 +541,9 @@
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -337,10 +556,26 @@
     },
     "/api/appointments/": {
       "get": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Listar todas las citas",
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -348,13 +583,32 @@
         }
       },
       "post": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Agendar una nueva cita (GERENCIA o RECEPCIONISTA)",
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -390,12 +644,23 @@
     },
     "/api/appointments/{id}": {
       "get": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Obtener una cita por ID",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -408,6 +673,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -417,12 +685,71 @@
         }
       }
     },
-    "/api/users/": {
-      "get": {
+    "/api/users/login": {
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Iniciar sesión y obtener token JWT",
         "description": "",
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "any"
+                  },
+                  "password": {
+                    "example": "any"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Listar todos los usuarios (Solo GERENCIA)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -430,13 +757,32 @@
         }
       },
       "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Crear un nuevo usuario (Solo GERENCIA)",
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -472,12 +818,23 @@
     },
     "/api/users/{id}": {
       "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Obtener un usuario por ID (Solo GERENCIA)",
         "description": "",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "schema": {
               "type": "string"
             }
@@ -490,68 +847,17 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
           "404": {
             "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/api/users/login": {
-      "post": {
-        "tags": [
-          "Usuarios"
-        ],
-        "summary": "Iniciar sesión y obtener token JWT",
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "Login exitoso",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "token": {
-                      "type": "string",
-                      "example": "eyJhbGciOiJIUzI1NiIs..."
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Credenciales inválidas"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "email",
-                  "password"
-                ],
-                "properties": {
-                  "email": {
-                    "type": "string",
-                    "example": "admin@clinica.com"
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "123456"
-                  }
-                }
-              }
-            }
           }
         }
       }
@@ -565,5 +871,10 @@
         "bearerFormat": "JWT"
       }
     }
-  }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
 }

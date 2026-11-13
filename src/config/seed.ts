@@ -121,6 +121,9 @@ if (process.argv[1]?.includes('seed')) {
     });
 }
 
+// fin - src/config/seed.ts
+
+
 // Ejecución automática al llamar el script
 
 /*

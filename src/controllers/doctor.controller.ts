@@ -1,6 +1,6 @@
 // src/controllers/doctor.controller.ts
-//import { Prisma } from '@prisma/client';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Prisma } from '@prisma/client';
+//import { Prisma } from '../../generated/prisma/client.js';
 import { Request, Response } from 'express';
 // import prisma from '../config/prisma';
 import * as DoctorModel from '../models/doctor.model.js';
