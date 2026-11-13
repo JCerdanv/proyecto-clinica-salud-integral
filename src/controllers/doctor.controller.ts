@@ -17,10 +17,11 @@ export const getDoctors = async (req: Request, res: Response) => {
   }
 };
 
+
 export const createDoctor = async (req: Request, res: Response) => {
   try {
-    const { nombre, apellido, cmp, phone_number: phoneNumber, ecorreo, specialtyId } = req.body;
-    if (!nombre || !apellido || !cmp || !phoneNumber || !ecorreo || !specialtyId) {
+    const { nombre, apellido, cmp, phone_number, ecorreo, specialtyId } = req.body;
+    if (!nombre || !apellido || !cmp  || !phone_number || !ecorreo || !specialtyId) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios' });
     }
 
@@ -28,7 +29,7 @@ export const createDoctor = async (req: Request, res: Response) => {
       nombre,
       apellido,
       cmp,
-      phoneNumber,
+      phone_number,
       ecorreo,
       especialidad: { connect: { id: Number(specialtyId) } }
     });

@@ -40,4 +40,3 @@ export function verifyToken(req: Request, res: Response, next: NextFunction): vo
   }
 }
 // fin - src/middlewares/auth.middleware.ts
-

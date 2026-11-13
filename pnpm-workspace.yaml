@@ -3,4 +3,5 @@ allowBuilds:
   '@scarf/scarf': true
   bcrypt: true
   esbuild: true
+  nodemon: true
   prisma: true

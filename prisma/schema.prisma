@@ -43,7 +43,7 @@ model Medico {
   nombre       String
   apellido     String
   cmp          String       @unique
-  phone_number String?
+  phone_number String
   ecorreo      String
   specialtyId  Int          @map("specialty_id")
   especialidad Especialidad @relation(fields: [specialtyId], references: [id])
