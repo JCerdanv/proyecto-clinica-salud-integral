@@ -1,5 +1,6 @@
 // src/controllers/specialty.controller.ts
 import { Request, Response } from 'express';
+import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma';
 
 // GET /api/specialties (sin parámetros) retorna todas las especialidades
@@ -33,19 +34,20 @@ export const getSpecialties = async (req: Request, res: Response) => {
 export const createSpecialty = async (req: Request, res: Response) => {
   try {
     const { nombre, descripcion } = req.body;
-    if (!nombre || !descripcion) {
-      return res.status(400).json({ error: 'El nombre y la descripción son obligatorios' });
-    }
 
     const data = await prisma.especialidad.create({
-      data: { nombre, descripcion }
+      data: { nombre, descripcion },
     });
-    res.status(201).json(data);
+
+    return res.status(201).json(data);
   } catch (error) {
-    res.status(500).json({ error: 'Error al crear la especialidad' });
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return res.status(400).json({ error: '> Ya existe una especialidad con ese nombre' });
+    }
+    console.error('Error en createSpecialty:', error);
+    return res.status(500).json({ error: '> Error al crear la especialidad' });
   }
 };
-
 
 export const getSpecialtyById = async (req: Request, res: Response) => {
   try {

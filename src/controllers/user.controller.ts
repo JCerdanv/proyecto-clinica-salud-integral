@@ -2,7 +2,9 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma';
+
 
 const SALT_ROUNDS = 10;
 
@@ -49,26 +51,27 @@ export const getUsersById = async (req: Request, res: Response) => {
   }
 };
 
-
 export const createUser = async (req: Request, res: Response) => {
   try {
+    // req.body ya viene validado y sanitizado por validateCreateUser
     const { name, email, password, role_id, role } = req.body;
-    if (!name || !email || !password || !role_id || !role) {
-      return res.status(400).json({ error: '> Todos los campos de usuario son obligatorios' });
-    }
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     const data = await prisma.user.create({
       data: { name, email, password: hashedPassword, role_id, role },
-      select: { id: true, name: true, email: true, role: true } // Oculta password en la respuesta
+      select: { id: true, name: true, email: true, role: true },
     });
-    res.status(201).json(data);
-  } catch (error) {
-    res.status(500).json({ error: '> Error al registrar el usuario' });
-    }
-  };
 
+    return res.status(201).json(data);
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return res.status(400).json({ error: '> Ya existe un usuario registrado con ese correo' });
+    }
+    console.error('Error en createUser:', error);
+    return res.status(500).json({ error: '> Error al registrar el usuario' });
+  }
+};
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
@@ -88,7 +91,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET as string,
-      { expiresIn: '1h' }
+      { expiresIn: '8h' }
     );
 
     res.status(200).json({ token });

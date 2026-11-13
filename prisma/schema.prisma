@@ -43,8 +43,8 @@ model Medico {
   nombre       String
   apellido     String
   cmp          String       @unique
-  phone_number String       @default("")
-  ecorreo      String       @default("")
+  phone_number String
+  ecorreo      String
   specialtyId  Int          @map("specialty_id")
   especialidad Especialidad @relation(fields: [specialtyId], references: [id])
   citas        Cita[]
@@ -59,7 +59,7 @@ model Paciente {
   dni          String @unique
   phone_number String
   ecorreo      String
-  fechaNacimiento DateTime? @map("fecha_nacimiento") 
+  fechaNacimiento DateTime @map("fecha_nacimiento")
   comentario   String?
   citas        Cita[]
 

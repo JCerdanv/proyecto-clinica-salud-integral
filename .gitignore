@@ -16,3 +16,4 @@ routes/xuserRoute.ts
 controllers/XpostControllers.ts
 prisma/migrations/
 /src/config/prisma/
+~$clinica.xlsx
