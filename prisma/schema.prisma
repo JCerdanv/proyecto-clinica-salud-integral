@@ -48,6 +48,7 @@ model Medico {
   specialtyId  Int          @map("specialty_id")
   especialidad Especialidad @relation(fields: [specialtyId], references: [id])
   citas        Cita[]
+  user         User?
 
   @@map("medicos")
 }
@@ -80,12 +81,14 @@ model Cita {
 }
 
 model User {
-  id      Int    @id @default(autoincrement()) 
-  name    String
-  email   String @unique
+  id       Int     @id @default(autoincrement()) 
+  name     String
+  email    String  @unique
   password String
-  role_id Int    @map("role_id")
-  role    Role
+  role_id  Int     @map("role_id")
+  role     Role
+  doctorId Int?    @unique @map("doctor_id")
+  medico   Medico? @relation(fields: [doctorId], references: [id])
 
   @@map("users")
 }

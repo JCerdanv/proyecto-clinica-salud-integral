@@ -6,6 +6,14 @@ export interface AuthPayload {
   id: number;
   email: string;
   role: 'RECEPCIONISTA' | 'MEDICO' | 'GERENCIA';
+  doctorId?: number | null;
+}
+
+export interface JwtPayloadUser {
+  id: number;
+  email: string;
+  role: 'RECEPCIONISTA' | 'MEDICO' | 'GERENCIA';
+  doctorId?: number | null;
 }
 
 declare global {
@@ -34,6 +42,8 @@ export function verifyToken(req: Request, res: Response, next: NextFunction): vo
 
   try {
     req.user = jwt.verify(token, process.env.JWT_SECRET as string) as AuthPayload;
+    let usuarioNewClinica = req.user.email;
+    let rolNewClinica = req.user.role
     next();
   } catch {
     res.status(401).json({ message: '> Token inválido o expirado' });

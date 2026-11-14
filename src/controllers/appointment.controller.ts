@@ -1,5 +1,5 @@
 // src/controllers/appointment.controller.ts
-//import { Request, Response } from 'express';
+
 import type { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma';
@@ -86,6 +86,13 @@ export const getDoctorAppointments = async (
       return res.status(400).json({ error: '> El ID del médico debe ser un número válido' });
     }
 
+    // Validación de pertenencia (Ownership)
+    if (req.user?.role === 'MEDICO' && req.user.doctorId !== doctorId) {
+      return res.status(403).json({  
+      error: `> Acceso denegado: ${req.user.email} no puedes consultar la agenda de otro médico`,   
+      });
+    }
+    //console.log(`  Usuario actual:   ${req.user.email} | Rol: ${req.user.role} -> ${req.method} ${req.originalUrl}`);
     const doctor = await DoctorModel.getDoctorById(doctorId);
     if (!doctor) {
       return res.status(404).json({ error: '> Médico no encontrado' });
@@ -121,6 +128,19 @@ export const updateAppointmentStatus = async (
     const id = Number(req.params.id);
     if (isNaN(id)) {
       return res.status(400).json({ error: '> El ID de la cita debe ser un número válido' });
+    }
+    
+    // 1. Buscar la cita primero para verificar existencia y pertenencia
+    const appointment = await AppointmentModel.getAppointmentById(id);
+    if (!appointment) {
+      return res.status(404).json({ error: '> Cita no encontrada' });
+    }
+    //console.log('Comparando ownership:', { citaDoctorId: appointment.doctorId, tokenDoctorId: req.user?.doctorId });
+    // 2. Verificar que la cita pertenece al médico autenticado
+    if (req.user?.role === 'MEDICO' && appointment.doctorId !== req.user.doctorId) {
+      return res.status(403).json({
+        error: `> Acceso denegado: ${req.user.email} solo puedes actualizar tus propias citas`,
+      });
     }
 
     const { status } = req.body;

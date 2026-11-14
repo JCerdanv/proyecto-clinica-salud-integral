@@ -1,7 +1,9 @@
 // index.ts
 
 import express from 'express';
-import type { Application, Request, Response } from "express";
+//import type { Application, Request, Response } from "express";
+import type { Application, Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+
 import dotenv from 'dotenv'
 import cors from 'cors'
 // import { output, z } from "zod";
@@ -18,8 +20,12 @@ import doctorRoutes from './routes/doctor.routes';
 import patientRoutes from './routes/patient.routes';
 import appointmentRoutes from './routes/appointment.routes.js';
 import userRoutes from './routes/user.routes';
+import reportRoutes from './routes/report.routes.js';
 
-dotenv.config();
+const usuarioNewClinica: string = 'Sin sesión activa, login ';
+const rolNewClinica: string = "..."
+
+// dotenv.config();
 
 const swaggerFile = JSON.parse(
   readFileSync(new URL('./swagger/swagger_output.json', import.meta.url), 'utf-8')
@@ -34,6 +40,14 @@ app.use(express.json());
 
 // Documentación Swagger
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+// 1. Middleware de JSON malformado (antes de las rutas)
+const jsonSyntaxErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  if (err instanceof SyntaxError && 'body' in err) {
+    return res.status(400).json({ error: '> El cuerpo de la petición no es un JSON válido' });
+  }
+  next(err);
+};
 
 // Ruta básica
 app.get('/', (req: Request, res: Response) => {
@@ -78,26 +92,34 @@ app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/reports', reportRoutes);
 
-// Middleware global de manejo de errores (SIEMPRE después de todas las rutas)
-app.use((err: any, req: Request, res: Response, next: express.NextFunction) => {
+// 2. Middleware global de errores (después de todas las rutas)
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   console.error('Error no controlado:', err);
 
-  const statusCode = err.status || err.statusCode || 500;
-  const message = err.message || '> Error interno del servidor';
+  const statusCode =
+    typeof err === 'object' && err !== null && 'status' in err && typeof err.status === 'number'
+      ? err.status
+      : 500;
 
-  return res.status(statusCode).json({
-    error: message,
-  });
-});
+  const message =
+    err instanceof Error ? err.message : '> Error interno del servidor';
+
+  return res.status(statusCode).json({ error: message });
+};
+
+app.use(globalErrorHandler);
 
 app.listen(PORT, () => {
-  console.log(`\n Server Clínica Salud Integral en http://localhost:${PORT}`);
+  console.log(`\n Server Clínica Salud Integral en http://localhost:${PORT} \n`);
+  //console.log(`  Usuario actual:   ${usuarioNewClinica} ${rolNewClinica}`);
   console.log(`  Endpoints disponibles de manera estructurada:`);
   console.log(`   - Especialidades: http://localhost:${PORT}/api/specialties`);
   console.log(`   - Médicos:        http://localhost:${PORT}/api/doctors`);
   console.log(`   - Pacientes:      http://localhost:${PORT}/api/patients`);
   console.log(`   - Citas:          http://localhost:${PORT}/api/appointments`);
+  console.log(`   - Reportes:       http://localhost:${PORT}/api/reports`);
   console.log(`   - Usuarios:       http://localhost:${PORT}/api/users`);
   console.log(` - Reset DB:       http://localhost:${PORT}/data`);
   console.log(` - Swagger:        http://localhost:${PORT}/api/docs\n`);

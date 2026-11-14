@@ -5,7 +5,6 @@ import jwt from 'jsonwebtoken';
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma';
 
-
 const SALT_ROUNDS = 10;
 
 export const getUsers = async (req: Request, res: Response) => {
@@ -13,7 +12,8 @@ export const getUsers = async (req: Request, res: Response) => {
     const data = await prisma.user.findMany({
       select: {
         id: true,       name: true,
-        email: true,    role: true
+        email: true,    role: true,
+        doctorId: true
       }
     });
     res.json(data);
@@ -33,11 +33,9 @@ export const getUsersById = async (req: Request, res: Response) => {
     const usuario = await prisma.user.findUnique({
       where: { id },
       select: {
-        id: true,
-        name: true,
-        email: true,
-        role_id: true,
-        role: true,
+        id: true,         name: true,
+        email: true,      role_id: true,
+        role: true,       doctorId: true
       },
     });
 
@@ -54,13 +52,14 @@ export const getUsersById = async (req: Request, res: Response) => {
 export const createUser = async (req: Request, res: Response) => {
   try {
     // req.body ya viene validado y sanitizado por validateCreateUser
-    const { name, email, password, role_id, role } = req.body;
+    
+    const { name, email, password, role_id, role, doctorId } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
     const data = await prisma.user.create({
-      data: { name, email, password: hashedPassword, role_id, role },
-      select: { id: true, name: true, email: true, role: true },
+      data: { name, email, password: hashedPassword, role_id, role, doctorId },
+      select: { id: true, name: true, email: true, role: true, doctorId: true },
     });
 
     return res.status(201).json(data);
@@ -79,20 +78,27 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      return res.status(401).json({ message: '> Credenciales inválidas' });
+      return res.status(401).json({ message: '> Usuario: Credenciales inválidas' });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
-      return res.status(401).json({ message: '> Credenciales inválidas' });
+      return res.status(401).json({ message: 'Contraseña:  Credenciales inválidas' });
     }
 
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { 
+        id: user.id, 
+        email: user.email, 
+        role: user.role, 
+        doctorId: user.doctorId ?? null, 
+      },
       process.env.JWT_SECRET as string,
       { expiresIn: '8h' }
     );
+    
+    // console.log(`  Usuario actual:   ${user.name} (${user.email}) | Rol: ${user.role} `);
 
     res.status(200).json({ token });
   } catch (error) {

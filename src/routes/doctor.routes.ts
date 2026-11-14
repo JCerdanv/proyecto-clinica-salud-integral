@@ -20,9 +20,7 @@ router.get('/:id', verifyToken, (req, res) => {
   return getDoctorById(req, res);
 });
 
-
 // router.get('/:id/appointments', authenticate,  authorize('MEDICO'), getDoctorAppointments );
-
 router.get('/:id/appointments', verifyToken, authorize('MEDICO'), (req, res, next) => {
   // #swagger.tags = ['Médicos']
   // #swagger.summary = 'Obtener agenda del médico filtrable por rango de fechas (Solo MEDICO)'
@@ -36,8 +34,6 @@ router.post('/', verifyToken, authorize('GERENCIA'), validateCreateDoctor, (req,
   // #swagger.summary = 'Registrar un nuevo médico (Solo GERENCIA)'
   return createDoctor(req, res);
 });
-
-
 
 export default router;
 // fin - src/routes/doctor.routes.ts
