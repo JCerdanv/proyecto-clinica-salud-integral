@@ -2,40 +2,50 @@
 import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-export const createAppointmentSchema = z.object({
-  patientId: z.coerce
-    .number({ message: '> El ID del paciente debe ser un número' })
-    .int('> El ID del paciente debe ser un entero')
-    .positive('> El ID del paciente debe ser positivo'),
-  doctorId: z.coerce
-    .number({ message: '> El ID del médico debe ser un número' })
-    .int('> El ID del médico debe ser un entero')
-    .positive('> El ID del médico debe ser positivo'),
-  dateTime: z.coerce.date({
-    message: '> La fecha y hora de la cita deben tener un formato válido (ISO 8601)',
+
+export const appointmentSchema = z.object({
+  patientId: z.number().int().positive('El ID del paciente debe ser positivo'),
+  doctorId: z.number().int().positive('El ID del médico debe ser positivo'),
+  dateTime: z.coerce.date().refine((date) => date > new Date(), {
+    message: 'No puedes agendar una cita en una fecha que ya pasó',
   }),
-  status: z
-    .enum(['PROGRAMADA', 'COMPLETADA', 'CANCELADA'], {
-      message: '> El estado debe ser PROGRAMADA, COMPLETADA o CANCELADA',
-    })
-    .default('PROGRAMADA'),
-  diagnosis: z
-    .string({ message: '> El diagnóstico o motivo es obligatorio' })
-    .trim()
-    .min(1, '> El diagnóstico no puede estar vacío'),
+  diagnosis: z.string().optional(),
 });
 
-export const validateCreateAppointment = (req: Request, res: Response, next: NextFunction): void => {
-  const result = createAppointmentSchema.safeParse(req.body ?? {});
+export const appointmentStatusSchema = z.object({
+  status: z.enum(['COMPLETADA', 'CANCELADA'], {
+    message: 'El estado debe ser COMPLETADA o CANCELADA',
+  }),
+});
 
+export const validateAppointment = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const result = appointmentSchema.safeParse(req.body);
   if (!result.success) {
-    res.status(400).json({
-      error: '> Datos de la cita inválidos',
-      detalles: result.error.flatten().fieldErrors,
+    return res.status(400).json({
+      message: 'Datos de cita inválidos',
+      errors: result.error.flatten().fieldErrors,
     });
-    return;
   }
+  req.body = result.data;
+  next();
+};
 
+export const validateAppointmentStatus = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const result = appointmentStatusSchema.safeParse(req.body);
+  if (!result.success) {
+    return res.status(400).json({
+      message: 'Estado inválido',
+      errors: result.error.flatten().fieldErrors,
+    });
+  }
   req.body = result.data;
   next();
 };

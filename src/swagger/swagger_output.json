@@ -449,6 +449,68 @@
         }
       }
     },
+    "/api/doctors/{id}/appointments": {
+      "get": {
+        "tags": [
+          "Médicos"
+        ],
+        "summary": "Obtener agenda del médico filtrable por rango de fechas (Solo MEDICO)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "example": "2026-11-01",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "example": "2026-11-30",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/patients/": {
       "get": {
         "tags": [
@@ -586,7 +648,7 @@
         "tags": [
           "Citas"
         ],
-        "summary": "Agendar una nueva cita (GERENCIA o RECEPCIONISTA)",
+        "summary": "Agendar una nueva cita (RECEPCIONISTA o GERENCIA)",
         "description": "",
         "parameters": [
           {
@@ -610,30 +672,40 @@
           "403": {
             "description": "Forbidden"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         },
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": [
+                  "patientId",
+                  "doctorId",
+                  "dateTime"
+                ],
                 "properties": {
                   "patientId": {
-                    "example": "any"
+                    "type": "integer",
+                    "example": 1
                   },
                   "doctorId": {
-                    "example": "any"
+                    "type": "integer",
+                    "example": 2
                   },
                   "dateTime": {
-                    "example": "any"
-                  },
-                  "status": {
-                    "example": "any"
+                    "type": "string",
+                    "example": "2026-12-15T10:30:00Z"
                   },
                   "diagnosis": {
-                    "example": "any"
+                    "type": "string",
+                    "example": "Consulta preventiva"
                   }
                 }
               }
@@ -681,6 +753,71 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/appointments/{id}/status": {
+      "patch": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Actualizar estado de una cita (Solo MEDICO)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "status"
+                ],
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "example": "COMPLETADA"
+                  }
+                }
+              }
+            }
           }
         }
       }

@@ -58,7 +58,7 @@ export async function runSeed() {
       { nombre: "Ernesto",apellido: "Avila",   dni: "14184328", phone_number: "+51 960 998 750", ecorreo: "ernesto@yahoo.es", fechaNacimiento: new Date("1991-08-16"), comentario: "socio" },
       { nombre: "Mateo",  apellido: "Muñoz",   dni: "94236534", phone_number: "+51 940 405 942", ecorreo: "miki@bcp.pe", fechaNacimiento: new Date("1985-03-28"), comentario: "familiar" },
       { nombre: "Alicia", apellido: "Salas",   dni: "18032848", phone_number: "+51 900 001 212", ecorreo: "maria@usat.edu", fechaNacimiento: new Date("1980-11-02"), comentario: "bajos recursosr" },
-      { nombre: "Daniel", apellido: "Villalobos", dni: "15380285", phone_number: "+51 918 512 373", ecorreo: "daniel@yahoo.com", fechaNacimiento: new Date("1985-03-28"), comentario: "menor de edad" },
+      { nombre: "Daniel", apellido: "Villalobos", dni: "15380285", phone_number: "+51 918 512 373", ecorreo: "daniel@yahoo.com", fechaNacimiento: new Date("2015-03-28"), comentario: "menor de edad" },
     ]
   });
 

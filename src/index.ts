@@ -2,7 +2,6 @@
 
 import express from 'express';
 import type { Application, Request, Response } from "express";
-import prisma from './config/prisma'
 import dotenv from 'dotenv'
 import cors from 'cors'
 // import { output, z } from "zod";
@@ -17,7 +16,7 @@ import authRoutes from './routes/auth.routes.js';
 import specialtyRoutes from './routes/specialty.routes';
 import doctorRoutes from './routes/doctor.routes';
 import patientRoutes from './routes/patient.routes';
-import appointmentRoutes from './routes/appointment.routes';
+import appointmentRoutes from './routes/appointment.routes.js';
 import userRoutes from './routes/user.routes';
 
 dotenv.config();
@@ -32,12 +31,6 @@ const PORT = process.env.PORT || 3000
 // Middlewares globales (siempre antes de las rutas)
 app.use(cors());
 app.use(express.json());
-app.use((err: any, req: Request, res: Response, next: express.NextFunction) => {
-  if (err instanceof SyntaxError && 'body' in err) {
-    return res.status(400).json({ error: '> El cuerpo de la petición no es un JSON válido' });
-  }
-  next(err);
-});
 
 // Documentación Swagger
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
@@ -54,10 +47,6 @@ app.get("/api", (req, res) => {
   // #swagger.summary = 'Endpoint base con CORS habilitado'  
   res.json({ message: "CORS-enabled endpoint" });
 });
-
-// Rutas de la API (Ahora sí recibirán el req.body correctamente mapeado)
-// Endpoint para iniciar o reiniciar los datos de la clínica
-//app.get('/data', async (req: Request, res: Response) => {
 
 app.post('/data', verifyToken, authorize('GERENCIA'), async (req: Request, res: Response) => {
   // #swagger.tags = ['Sistema']
@@ -82,14 +71,25 @@ app.post('/data', verifyToken, authorize('GERENCIA'), async (req: Request, res: 
   }
 })
 
-app.use('/api/auth', authRoutes);
-
 // Vinculación de rutas estructuradas
+app.use('/api/auth', authRoutes);
 app.use('/api/specialties', specialtyRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/users', userRoutes);
+
+// Middleware global de manejo de errores (SIEMPRE después de todas las rutas)
+app.use((err: any, req: Request, res: Response, next: express.NextFunction) => {
+  console.error('Error no controlado:', err);
+
+  const statusCode = err.status || err.statusCode || 500;
+  const message = err.message || '> Error interno del servidor';
+
+  return res.status(statusCode).json({
+    error: message,
+  });
+});
 
 app.listen(PORT, () => {
   console.log(`\n Server Clínica Salud Integral en http://localhost:${PORT}`);

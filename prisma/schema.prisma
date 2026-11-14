@@ -73,8 +73,8 @@ model Cita {
   doctorId   Int        @map("doctor_id")
   medico     Medico     @relation(fields: [doctorId], references: [id])
   dateTime   DateTime   @map("date_time")
-  status     EstadoCita
-  diagnosis  String
+  status     EstadoCita @default(PROGRAMADA)
+  diagnosis  String?
 
   @@map("citas")
 }
