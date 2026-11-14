@@ -13,6 +13,7 @@ const router: Router = Router();
 router.post('/login', validateLogin, (req, res) => {
   // #swagger.tags = ['Usuarios']
   // #swagger.summary = 'Iniciar sesión y obtener token JWT'
+  
   return loginUser(req, res);
 });
 

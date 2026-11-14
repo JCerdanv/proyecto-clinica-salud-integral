@@ -33,6 +33,12 @@ export const createUserSchema = z.object({
   role: z.enum(['RECEPCIONISTA', 'MEDICO', 'GERENCIA'], {
     message: '> El rol debe ser RECEPCIONISTA, MEDICO o GERENCIA',
   }),
+    doctorId: z
+    .number({ message: '> El doctorId debe ser un número entero' })
+    .int('> El doctorId debe ser un entero')
+    .positive('> El doctorId debe ser positivo')
+    .nullable()
+    .optional(),
 });
 
 export const validateLogin = (req: Request, res: Response, next: NextFunction): void => {

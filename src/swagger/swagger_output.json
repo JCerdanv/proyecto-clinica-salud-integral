@@ -110,6 +110,9 @@
                   },
                   "role": {
                     "example": "any"
+                  },
+                  "doctorId": {
+                    "example": "any"
                   }
                 }
               }
@@ -504,9 +507,6 @@
           },
           "404": {
             "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
@@ -674,9 +674,6 @@
           },
           "404": {
             "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         },
         "requestBody": {
@@ -750,9 +747,6 @@
           },
           "404": {
             "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         }
       }
@@ -796,9 +790,6 @@
           },
           "404": {
             "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
           }
         },
         "requestBody": {
@@ -945,6 +936,9 @@
                   },
                   "role": {
                     "example": "any"
+                  },
+                  "doctorId": {
+                    "example": "any"
                   }
                 }
               }
@@ -995,6 +989,76 @@
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/api/reports/appointments-by-specialty": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Volumen de citas agrupadas por especialidad (Solo GERENCIA)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/api/reports/daily-cutoff": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Corte operativo diario de citas completadas y canceladas (Solo GERENCIA)",
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "example": "2026-07-16",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
           }
         }
       }
